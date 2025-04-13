@@ -85,6 +85,10 @@
     "eslint --fix",
     "echo 🎨 Running Prettier...",
     "prettier --write"
+  ],
+  "*.ts?(x)": [
+    "echo 🧪 Running tests...",
+    "npx jest --coverage --passWithNoTests" 
   ]
 }
 }

@@ -1,0 +1,21 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type SearchItem {
+  title: String!
+
+  """Год выпуска"""
+  year: String
+  thumb: String!
+  resourceUrl: String!
+}
+
+type SearchResult {
+  paginationCount: Float!
+  items: [SearchItem!]!
+}
+
+type Query {
+  searchDiscogs(query: String!): SearchResult!
+}

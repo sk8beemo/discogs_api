@@ -4,18 +4,30 @@
 
 type SearchItem {
   title: String!
-
-  """Год выпуска"""
-  year: String
-  thumb: String!
-  resourceUrl: String!
+  type: String
+  format: String
+  genre: String
+  year: Int
+  country: String
+  label: String
+  thumb: String
+  uri: String
 }
 
 type SearchResult {
-  paginationCount: Float!
-  items: [SearchItem!]!
+  results: [SearchItem!]!
+  total: Int!
+  page: Int!
+  pages: Int!
 }
 
 type Query {
-  searchDiscogs(query: String!): SearchResult!
+  searchDiscogs(input: SearchInput!): SearchResult!
+}
+
+input SearchInput {
+  query: String!
+  type: String
+  page: Int
+  perPage: Int
 }

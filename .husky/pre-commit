@@ -1,0 +1,17 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Pre-commit hook is running..."
+
+# Запускаем lint-staged
+npx lint-staged
+
+# Запускаем тесты
+echo "🧪 Running tests..."
+npx jest --coverage --passWithNoTests # Запуск тестов, даже если нет тестов
+
+# Если тесты не прошли, прерываем коммит
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed! Commit aborted."
+  exit 1
+fi

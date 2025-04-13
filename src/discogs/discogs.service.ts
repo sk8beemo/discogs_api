@@ -1,38 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Discogs from 'disconnect';
-import { SearchResult, SearchItem } from './dto/search-result.dto';
+import { DiscogsSearchResponse } from './discogs-response.interface';
 
 @Injectable()
 export class DiscogsService {
-  private db: Discogs.Database;
+  private readonly baseUrl = 'https://api.discogs.com';
+  private readonly token: string;
 
-  constructor(private configService: ConfigService) {
-    const client = new Discogs.Client({
-      userToken: this.configService.get('DISCOGS_TOKEN'),
-    });
-
-    this.db = client.database();
+  constructor(private readonly configService: ConfigService) {
+    const token = this.configService.get<string>('DISCOGS_TOKEN');
+    if (!token) {
+      throw new Error(
+        'DISCOGS_TOKEN is not defined in the environment variables.',
+      );
+    }
+    this.token = token;
   }
 
-  async search(q: string): Promise<SearchResult> {
-    const result = await new Promise<any>((resolve, reject) => {
-      this.db.search(q, { type: 'release' }, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
-    });
+  async searchReleases(
+    query: string,
+    type: string = 'release',
+    page: number = 1,
+    perPage: number = 10,
+  ): Promise<DiscogsSearchResponse> {
+    const url = new URL(`${this.baseUrl}/database/search`);
+    url.searchParams.append('q', query);
+    url.searchParams.append('type', type);
+    url.searchParams.append('page', page.toString());
+    url.searchParams.append('per_page', perPage.toString());
+    url.searchParams.append('token', this.token);
 
-    const items: SearchItem[] = result.results.map((r: any) => ({
-      title: r.title,
-      year: r.year,
-      thumb: r.thumb,
-      resourceUrl: r.resource_url,
-    }));
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      throw new Error(`Discogs API error: ${res.status} ${res.statusText}`);
+    }
 
-    return {
-      paginationCount: result.pagination.items.total,
-      items,
-    };
+    const data: DiscogsSearchResponse =
+      (await res.json()) as DiscogsSearchResponse;
+    return data;
   }
 }

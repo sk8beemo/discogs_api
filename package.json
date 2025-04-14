@@ -28,7 +28,6 @@
     "@nestjs/graphql": "^13.1.0",
     "@nestjs/platform-express": "^11.0.1",
     "apollo-server-express": "^3.13.0",
-    "disconnect": "^1.2.2",
     "graphql": "^16.10.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
@@ -80,15 +79,15 @@
     "testEnvironment": "node"
   },
   "lint-staged": {
-  "*.ts": [
-    "echo 🔍 Running ESLint...",
-    "eslint --fix",
-    "echo 🎨 Running Prettier...",
-    "prettier --write"
-  ],
-  "*.ts?(x)": [
-    "echo 🧪 Running tests...",
-    "npx jest --coverage --passWithNoTests" 
-  ]
-}
+    "*.ts": [
+      "echo 🔍 Running ESLint...",
+      "eslint --fix",
+      "echo 🎨 Running Prettier...",
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "echo 🧪 Running tests...",
+      "npx jest --coverage --passWithNoTests"
+    ]
+  }
 }

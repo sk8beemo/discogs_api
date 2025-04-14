@@ -2,27 +2,34 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type SearchItem {
+type ReleaseItem {
   title: String!
-  type: String
-  format: String
-  genre: String
-  year: Int
   country: String
-  label: String
-  thumb: String
-  uri: String
+  year: Float
+  format: [String!]
 }
 
-type SearchResult {
-  results: [SearchItem!]!
-  total: Int!
-  page: Int!
-  pages: Int!
+type ReleaseSearchResult {
+  results: [ReleaseItem!]!
+  total: Float!
+  page: Float!
+  pages: Float!
+}
+
+type ArtistItem {
+  title: String!
+}
+
+type ArtistSearchResult {
+  results: [ArtistItem!]!
+  total: Float!
+  page: Float!
+  pages: Float!
 }
 
 type Query {
-  searchDiscogs(input: SearchInput!): SearchResult!
+  searchReleases(input: SearchInput!): ReleaseSearchResult!
+  searchArtists(input: SearchInput!): ArtistSearchResult!
 }
 
 input SearchInput {

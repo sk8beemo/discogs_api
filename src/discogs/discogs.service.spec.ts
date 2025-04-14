@@ -1,75 +1,95 @@
 import { DiscogsService } from './discogs.service';
-import { ConfigService } from '@nestjs/config';
-
-const mockConfigService = {
-  get: jest.fn(),
-};
+import { DiscogsApiClient } from './client/discogs-api.client';
+import { DiscogsSearchResponse } from './discogs-response.interface';
+import { ReleaseItem } from './models/search-release.model';
+import { ArtistItem } from './models/search-artist.model';
 
 describe('DiscogsService', () => {
   let service: DiscogsService;
+  let mockApiClient: { search: jest.Mock };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockConfigService.get.mockReturnValue('mock-token');
+    mockApiClient = {
+      search: jest.fn(),
+    };
 
-    service = new DiscogsService(mockConfigService as unknown as ConfigService);
-  });
-
-  describe('constructor', () => {
-    it('should throw an error if token is missing', () => {
-      mockConfigService.get.mockReturnValueOnce(undefined);
-      expect(() => new DiscogsService(mockConfigService as any)).toThrowError(
-        'DISCOGS_TOKEN is not defined in the environment variables.',
-      );
-    });
-
-    it('should set token if present', () => {
-      const instance = new DiscogsService(mockConfigService as any);
-      expect(instance).toBeDefined();
-    });
+    service = new DiscogsService(mockApiClient as unknown as DiscogsApiClient);
   });
 
   describe('searchReleases', () => {
-    beforeEach(() => {
-      global.fetch = jest.fn();
-    });
-
-    it('should call Discogs API and return data', async () => {
-      const mockResponse = {
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            results: [],
-            pagination: { page: 1, pages: 1, items: 0, per_page: 10 },
-          }),
+    it('should call search with correct arguments and return data', async () => {
+      const mockResponse: DiscogsSearchResponse<ReleaseItem> = {
+        results: [],
+        pagination: {
+          page: 1,
+          pages: 1,
+          items: 0,
+          per_page: 10,
+        },
       };
 
-      (fetch as jest.Mock).mockResolvedValue(mockResponse);
+      mockApiClient.search.mockResolvedValue(mockResponse);
 
-      const result = await service.searchReleases('test');
+      const result = await service.searchReleases('nirvana');
 
-      expect(fetch).toHaveBeenCalledWith(
-        expect.stringContaining('https://api.discogs.com/database/search'),
-      );
+      expect(mockApiClient.search).toHaveBeenCalledWith({
+        q: 'nirvana',
+        type: 'release',
+        page: 1,
+        perPage: 10,
+      });
 
-      expect(result).toEqual({
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should use default values when optional args are not passed', async () => {
+      const mockResponse: DiscogsSearchResponse<ReleaseItem> = {
         results: [],
-        pagination: { page: 1, pages: 1, items: 0, per_page: 10 },
+        pagination: {
+          page: 1,
+          pages: 1,
+          items: 0,
+          per_page: 10,
+        },
+      };
+
+      mockApiClient.search.mockResolvedValue(mockResponse);
+
+      await service.searchReleases('daft punk');
+
+      expect(mockApiClient.search).toHaveBeenCalledWith({
+        q: 'daft punk',
+        type: 'release',
+        page: 1,
+        perPage: 10,
       });
     });
+  });
 
-    it('should throw error if fetch fails', async () => {
-      const badResponse = {
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
+  describe('searchArtists', () => {
+    it('should call search with correct arguments and return data', async () => {
+      const mockResponse: DiscogsSearchResponse<ArtistItem> = {
+        results: [],
+        pagination: {
+          page: 1,
+          pages: 1,
+          items: 0,
+          per_page: 10,
+        },
       };
 
-      (fetch as jest.Mock).mockResolvedValue(badResponse);
+      mockApiClient.search.mockResolvedValue(mockResponse);
 
-      await expect(service.searchReleases('test')).rejects.toThrow(
-        'Discogs API error: 500 Internal Server Error',
-      );
+      const result = await service.searchArtists('radiohead');
+
+      expect(mockApiClient.search).toHaveBeenCalledWith({
+        q: 'radiohead',
+        type: 'artist',
+        page: 1,
+        perPage: 10,
+      });
+
+      expect(result).toEqual(mockResponse);
     });
   });
 });

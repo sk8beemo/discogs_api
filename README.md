@@ -6,7 +6,7 @@
 
 - **GraphQL** используется для общения между фронтендом и бэкендом.
 - **Apollo Server** — это сервер, на котором работает GraphQL.
-- В приложении реализован поиск релизов на **Discogs** и заполнение метатегов для MP3-файлов.
+- В приложении реализован поиск релизов и артистов на **Discogs**
 
 ## Установка
 
@@ -33,15 +33,15 @@
 
 ## Available Queries
 
-### `searchDiscogs`
+### `searchReleases`
 
 Этот запрос позволяет выполнить поиск по релизам на Discogs.
 
-#### Запрос:
+### Зарос:
 
 ```graphql
-query SearchDiscogs($query: String!, $type: String, $page: Int, $perPage: Int) {
-  searchDiscogs(input: { query: $query, type: $type, page: $page, perPage: $perPage }) {
+query SearchReleases($query: String!, $type: String, $page: Int, $perPage: Int) {
+  searchReleases(input: { query: $query, type: $type, page: $page, perPage: $perPage }) {
     results {
       title
       year
@@ -53,3 +53,24 @@ query SearchDiscogs($query: String!, $type: String, $page: Int, $perPage: Int) {
     pages
   }
 }
+```
+
+### `searchArtists`
+
+Этот запрос позволяет выполнить поиск по артистам на Discogs.
+
+### Зарос:
+
+```graphql
+query SearchArtists($query: String!, $type: String, $page: Int, $perPage: Int) {
+  searchArtists(input: { query: $query, type: $type, page: $page, perPage: $perPage }) {
+    results {
+      title
+    }
+    total
+    page
+    pages
+  }
+}
+
+```

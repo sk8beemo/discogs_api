@@ -30,6 +30,7 @@
 
  ```bash
    npm run start
+ ```
 
 ## Available Queries
 
